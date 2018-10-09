@@ -1,7 +1,7 @@
 import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
-import { IRC } from './irc';
+// import { IRC } from './irc';
 
 const baseUrl = process.env.NODE_ENV === 'development' ?
   path.join(process.cwd(), './dist') :
@@ -24,7 +24,8 @@ function createWindow() {
   mainWindow.on('closed', () => {
     mainWindow = null as any;
   });
-  new IRC().open('irc.europnet.org', 6667);
+  mainWindow.webContents.openDevTools();
+  // new IRC().open('irc.europnet.org', 6667);
 }
 
 app.on('ready', createWindow);

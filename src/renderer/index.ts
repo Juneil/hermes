@@ -1,8 +1,13 @@
-import NAME from '../common';
+import '@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js';
+import '@webcomponents/webcomponentsjs/webcomponents-loader.js';
+import { PolymerElement } from '@polymer/polymer/polymer-element.js';
 
-export function init() {
-  document.write(`<h1>The name is ${NAME}</h1>`);
+// Define the class for a new element called custom-element
+class CustomElement extends PolymerElement {
+  constructor() {
+    super();
+    // this.textContent = 'I\'m a custom-element.';
+  }
 }
-
-console.log('page is loaded and ready');
-init();
+// Register the new element with the browser
+customElements.define('custom-element', CustomElement);
