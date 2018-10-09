@@ -1,7 +1,7 @@
-import { app, BrowserWindow } from "electron";
-import * as path from "path";
-import * as url from "url";
-import { IRC } from "./irc";
+import { app, BrowserWindow } from 'electron';
+import * as path from 'path';
+import * as url from 'url';
+import { IRC } from './irc';
 
 const baseUrl = process.env.NODE_ENV === 'development' ?
   path.join(process.cwd(), './dist') :
@@ -30,7 +30,7 @@ function createWindow() {
 app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
-  if (process.platform !== "darwin") {
+  if (process.platform !== 'darwin') {
     app.quit();
   }
 });
