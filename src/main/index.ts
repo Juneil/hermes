@@ -11,8 +11,8 @@ let mainWindow: Electron.BrowserWindow;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    height: 600,
-    width: 800
+    minHeight: 600,
+    minWidth: 1000
   });
   mainWindow.setMenu(null);
   mainWindow.setTitle(`${process.env.npm_package_name} v${process.env.npm_package_version}`);
