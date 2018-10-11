@@ -78,6 +78,7 @@ class MainPanel extends PolymerElement {
                 <div id="messages"></div>
                 <p class="bar bar_color">info channel - ddd - pp</p>
                 <input id="input" class="bar" type="text" on-keydown="keyDown"></input>
+
             </div>
         `;
     }
