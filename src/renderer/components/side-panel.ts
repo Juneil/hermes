@@ -14,10 +14,9 @@ class SidePanel extends PolymerElement {
         return html`
             <style>
                 :host {
-                    height: 100%;
                     border-right: 1px solid #516dab;
-                    display: block;
-                    width: 125px;
+                    display: flex;
+                    flex: 0 0 125px;
                 }
                 p {
                     margin: 0;
@@ -25,10 +24,13 @@ class SidePanel extends PolymerElement {
                 div {
                     padding: 5px;
                 }
+                span {
+                    color: #ffff77;
+                }
             </style>
             <div>
                 <template is="dom-repeat" items="[[list]]">
-                    <p>{{item}}</p>
+                    <p><span><strong>1.</strong></span>{{item}}</p>
                 </template>
             </div>
         `;

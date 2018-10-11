@@ -12,7 +12,9 @@ let mainWindow: Electron.BrowserWindow;
 function createWindow() {
   mainWindow = new BrowserWindow({
     minHeight: 600,
-    minWidth: 1000
+    minWidth: 1000,
+    height: 600,
+    width: 1000
   });
   mainWindow.setMenu(null);
   mainWindow.setTitle(`${process.env.npm_package_name} v${process.env.npm_package_version}`);

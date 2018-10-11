@@ -23,10 +23,18 @@
       }
       p {
         margin: 0;
+        line-height: 16px;
+      }
+      #container {
+        display: flex;
+        height: 100vh;
       }
     </style>
   </head>
   <body>
-    <side-panel></side-panel>
+    <div id="container">
+      <side-panel></side-panel>
+      <main-panel></main-panel>
+    </div>
   </body>
 </html>
