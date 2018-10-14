@@ -2,8 +2,9 @@ import * as Net from 'net';
 import * as Split2 from 'split2';
 import { Subject } from 'rxjs';
 import { filter, tap } from "rxjs/operators";
-import { StreamValue, MessageParser } from './messages';
+import { MessageParser } from './messages';
 import { Command } from './commands';
+import { StreamValue } from '../../common';
 
 export class IRC {
 
@@ -19,10 +20,10 @@ export class IRC {
             .pipe(Split2())
             .on('data', data => {
                 MessageParser
-                    .parse(Buffer.from(data).toString('utf8'))
+                    .parse(Buffer.from(data).toString('ascii'))
                     .forEach(parsed => this.stream.next(parsed));
             })
-            .on('close', () => console.log('Socket closed'));
+            .on('close', () => this.stream.complete());
         this.handle();
         return this.stream;
     }
@@ -37,10 +38,6 @@ export class IRC {
         this.stream.pipe(
             filter(_ => _.command === Command.PING),
             tap(_ => this.send(`PONG ${_.params[0]}`))
-        )
-        .subscribe();
-        this.stream.pipe(
-            tap(_ => console.log(_.prefix, _.command, _.params))
         )
         .subscribe();
     }
