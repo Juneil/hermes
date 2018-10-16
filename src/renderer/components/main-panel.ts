@@ -1,7 +1,6 @@
 import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
 import { Subject } from 'rxjs';
 import { StreamValue } from '../../common';
-import * as Moment from 'moment';
 import * as Electron from 'electron';
 import '@polymer/polymer/lib/elements/dom-repeat.js';
 
@@ -13,12 +12,8 @@ class MainPanel extends PolymerElement {
 
     constructor() {
         super();
-        Electron
-            .ipcRenderer
-            .on('msg', (_: any, arg: any) => this.stream.next(JSON.parse(arg)));
-
-        this.stream
-            .subscribe(msg => this.addContent(msg.prefix || '***', `${msg.command} ${msg.params.join(' ')}`));
+        Electron.ipcRenderer.on('msg', (_: any, arg: any) => this.stream.next(JSON.parse(arg)));
+        this.stream.subscribe(msg => this.addContent(msg.prefix || '***', `${msg.command} ${msg.params.join(' ')}`));
     }
 
     charWidth(): number {
@@ -30,24 +25,6 @@ class MainPanel extends PolymerElement {
         return width;
     }
 
-    targetFormat(target: string): string {
-        const length = 10;
-        if (target.length >= length) {
-            target = target.slice(0, length);
-        } else {
-            let spaces = '';
-            for (let i = 0; i < (length - target.length); i++) {
-                spaces += ' ';
-            }
-            target = spaces + target;
-        }
-        return `${Moment().format('HH:mm:ss')} ${target} |`;
-    }
-
-    convertSpace(content: string): string {
-        return content.replace(/\s/g, '&nbsp;');
-    }
-
     keyDown(event: any) {
         if (event.keyCode === 13) {
             this.addContent('IAmMe007', (<any>this.$.input).value);
@@ -55,25 +32,10 @@ class MainPanel extends PolymerElement {
     }
 
     addContent(target: string, text: string): void {
-        const content = Array.from(text);
         const message = document.createElement('p');
         const panelWidth = this.$.messages.getBoundingClientRect().width;
         const maxChars = Math.floor(panelWidth / this.charWidth()) - 23;
-        let buffer = `${this.targetFormat(target)} `;
-        while (content.length > 0) {
-            if (buffer.length > 22) {
-                buffer += '<br>' + Array(20).fill('&nbsp;').join('') + '| ';
-            } else {
-                buffer = this.convertSpace(buffer);
-            }
-            const b = content.slice(0, maxChars);
-            if (b.length === maxChars && b.indexOf(' ') > -1) {
-                buffer += content.splice(0, b.lastIndexOf(' ') + 1).join('').trim();
-            } else {
-                buffer += content.splice(0, maxChars).join('');
-            }
-        }
-        message.innerHTML = buffer;
+        message.innerHTML = Formatter.format(text, target, maxChars);
         (<any>this.$.input).value = '';
         this.$.messages.appendChild(message);
     }

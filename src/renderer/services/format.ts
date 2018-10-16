@@ -1,3 +1,5 @@
+import * as Moment from 'moment';
+
 enum Color {
     WHITE   = 0,
     BLACK   = 1,
@@ -40,9 +42,8 @@ export class Formatter {
 
     static colorRegex = /\x03(\d{1,2}(,\d{1,2})?)/;
 
-    static format(content: string): string {
-        let i = 0;
-        const blocks: FormatBlock[] = [];
+    static format(content: string, target: string, chars: number): string {
+        const lines = this.formatToInject(content, chars);
         const context: FormatBlock = {
             text: '',
             bold: false,
@@ -52,43 +53,69 @@ export class Formatter {
             foreground: -1,
             background: -1
         }
-        while (i < content.length) {
-            switch (content.charAt(i)) {
-                case Format.BOLD:
-                    blocks.push(this.clone(context));
-                    context.bold = !context.bold;
-                    break;
-                case Format.ITALIC:
-                    blocks.push(this.clone(context));
-                    context.italic = !context.italic;
-                    break;
-                case Format.UNDERLINE:
-                    blocks.push(this.clone(context));
-                    context.underline = !context.underline;
-                    break;
-                case Format.REVERSE:
-                    blocks.push(this.clone(context));
-                    context.reverse = !context.reverse;
-                    break;
-                case Format.COLOR:
-                const match = content.substr(i, 6).match(this.colorRegex) || [];
-                    if (match.length > 1) {
-                        i += match[1].length;
-                        const codes = match[1].split(',').map(_ => parseInt(_));
-                        context.foreground = codes[0];
-                        context.background = codes[1] >= 0 ? codes[1] : -1;
-                    } else {
-                        context.foreground = -1;
-                        context.background = -1;
-                    }
-                    break;
-                default:
-                    context.text += content.charAt(i);
+        const res = lines.map(line => {
+            const blocks: FormatBlock[] = [];
+            let i = 0;
+            while (i < line.length) {
+                switch (line.charAt(i)) {
+                    case Format.BOLD:
+                        blocks.push(this.clone(context));
+                        context.bold = !context.bold;
+                        break;
+                    case Format.ITALIC:
+                        blocks.push(this.clone(context));
+                        context.italic = !context.italic;
+                        break;
+                    case Format.UNDERLINE:
+                        blocks.push(this.clone(context));
+                        context.underline = !context.underline;
+                        break;
+                    case Format.REVERSE:
+                        blocks.push(this.clone(context));
+                        context.reverse = !context.reverse;
+                        break;
+                    case Format.COLOR:
+                    const match = line.substr(i, 6).match(this.colorRegex) || [];
+                        if (match.length > 1) {
+                            i += match[1].length;
+                            const codes = match[1].split(',').map(_ => parseInt(_));
+                            context.foreground = codes[0];
+                            context.background = codes[1] >= 0 ? codes[1] : -1;
+                        } else {
+                            context.foreground = -1;
+                            context.background = -1;
+                        }
+                        break;
+                    default:
+                        context.text += line.charAt(i);
+                }
+                i++;
             }
-            i++;
+            blocks.push(this.clone(context));
+            context.text = '';
+            return this.convertToHTML(blocks.filter(_ => _.text));
+        });
+        return this.addPrefixAndMerge(res, target);
+    }
+
+    private static addPrefixAndMerge(lines: string[], target: string): string {
+        return lines
+            .map((_, i) => `${i === 0 ? this.targetFormat(target) : this.targetFormat('')} ${_}`)
+            .join('<br>');
+    }
+
+    private static targetFormat(target: string): string {
+        const length = 10;
+        if (target.length >= length) {
+            target = target.slice(0, length);
+        } else {
+            let spaces = '';
+            for (let i = 0; i < (length - target.length); i++) {
+                spaces += '&nbsp;';
+            }
+            target = spaces + target;
         }
-        blocks.push(this.clone(context));
-        return this.convertToHTML(blocks.filter(_ => _.text));
+        return `${Moment().format('HH:mm:ss')} ${target} |`;
     }
 
     private static clone(context: FormatBlock): FormatBlock {
@@ -137,6 +164,20 @@ export class Formatter {
         } else {
             return data;
         }
+    }
+
+    private static formatToInject(data: string, chars: number): string[] {
+        const lines = [];
+        const content = Array.from(data);
+        while (content.length > 0) {
+            const tmp = content.slice(0, chars);
+            if (tmp.length === chars && tmp.indexOf(' ') > -1) {
+                lines.push(content.splice(0, tmp.lastIndexOf(' ') + 1).join('').trim());
+            } else {
+                lines.push(content.splice(0, chars).join(''));
+            }
+        }
+        return lines;
     }
 
     // private static colorToHTML(color: Color): string {
