@@ -1,3 +1,4 @@
+import { DefaultTheme as Theme } from '../../common';
 import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
 import '@polymer/polymer/lib/elements/dom-repeat.js';
 
@@ -14,7 +15,7 @@ class SidePanel extends PolymerElement {
         return html`
             <style>
                 :host {
-                    border-right: 1px solid #516dab;
+                    border-right: 1px solid ${Theme.DELIMITER_COLOR};
                     display: flex;
                     flex: 0 0 125px;
                 }
@@ -25,7 +26,7 @@ class SidePanel extends PolymerElement {
                     padding: 5px;
                 }
                 span {
-                    color: #ffff77;
+                    color: ${Theme.PANEL_ID_COLOR};
                 }
             </style>
             <div>

@@ -1,6 +1,6 @@
 import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
 import { Subject } from 'rxjs';
-import { StreamValue } from '../../common';
+import { StreamValue, DefaultTheme as Theme } from '../../common';
 import * as Electron from 'electron';
 import '@polymer/polymer/lib/elements/dom-repeat.js';
 
@@ -27,7 +27,7 @@ class MainPanel extends PolymerElement {
 
     keyDown(event: any) {
         if (event.keyCode === 13) {
-            this.addContent('IAmMe007', (<any>this.$.input).value);
+            this.addContent('IAmMe007', (<any>this.$.input).value + 'yo \x02BolD \x033\x1Fcolored\x03 reset - \x030,5color with bg');
         }
     }
 
@@ -38,6 +38,10 @@ class MainPanel extends PolymerElement {
         message.innerHTML = Formatter.format(text, target, maxChars);
         (<any>this.$.input).value = '';
         this.$.messages.appendChild(message);
+    }
+
+    static get theme() {
+        return Theme
     }
 
     static get template() {
@@ -52,7 +56,7 @@ class MainPanel extends PolymerElement {
                     padding: 0 5px;
                 }
                 .bar_color {
-                    background-color: #516dab;
+                    background-color: ${this.theme.DELIMITER_COLOR};
                 }
                 .bar {
                     flex: 0;
@@ -75,11 +79,17 @@ class MainPanel extends PolymerElement {
                 input {
                     border: 0;
                     outline: none;
-                    background: black;
-                    color: white;
+                    background: ${this.theme.BACKGROUND_COLOR};
+                    color: ${this.theme.TEXT_COLOR};
                     font-family: 'Inconsolata', monospace;
                     line-height: 16px;
                     font-size: 16px;
+                }
+                .time_delimiter {
+                    color: ${this.theme.TIME_DELIMITER_COLOR}
+                }
+                .separator {
+                    color: ${this.theme.SEPARATOR_COLOR}
                 }
                 .fg-0 { color: white; }
                 .fg-1 { color: black; }

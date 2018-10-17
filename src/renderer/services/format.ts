@@ -60,22 +60,28 @@ export class Formatter {
                 switch (line.charAt(i)) {
                     case Format.BOLD:
                         blocks.push(this.clone(context));
+                        context.text = '';
                         context.bold = !context.bold;
                         break;
                     case Format.ITALIC:
                         blocks.push(this.clone(context));
+                        context.text = '';
                         context.italic = !context.italic;
                         break;
                     case Format.UNDERLINE:
                         blocks.push(this.clone(context));
+                        context.text = '';
                         context.underline = !context.underline;
                         break;
                     case Format.REVERSE:
                         blocks.push(this.clone(context));
+                        context.text = '';
                         context.reverse = !context.reverse;
                         break;
                     case Format.COLOR:
-                    const match = line.substr(i, 6).match(this.colorRegex) || [];
+                        blocks.push(this.clone(context));
+                        context.text = '';
+                        const match = line.substr(i, 6).match(this.colorRegex) || [];
                         if (match.length > 1) {
                             i += match[1].length;
                             const codes = match[1].split(',').map(_ => parseInt(_));
@@ -115,11 +121,13 @@ export class Formatter {
             }
             target = spaces + target;
         }
-        return `${Moment().format('HH:mm:ss')} ${target} |`;
+        const moment = Moment();
+        const delim = '<span class="time_delimiter">:</span>';
+        return `${moment.format('HH')}${delim}${moment.format('mm')}${delim}${moment.format('ss')} ${target} <span class="separator">|</span>`;
     }
 
     private static clone(context: FormatBlock): FormatBlock {
-        return Object.assign({}, context);
+        return JSON.parse(JSON.stringify(context));
     }
 
     private static convertToHTML(blocks: FormatBlock[]): string {
